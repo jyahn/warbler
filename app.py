@@ -4,8 +4,8 @@ from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import UserAddForm, LoginForm, MessageForm, EditProfileForm
-from models import db, connect_db, User, Message
+from forms import UserAddForm, LoginForm, MessageForm, EditProfileForm, LikesForm
+from models import db, connect_db, User, Message, Like
 
 CURR_USER_KEY = "curr_user"
 
@@ -144,16 +144,19 @@ def users_show(user_id):
     """Show user profile."""
 
     user = User.query.get_or_404(user_id)
+    form = LikesForm()
 
     # snagging messages in order from the database;
     # user.messages won't be in order by default
+    # import pdb; pdb.set_trace()
+    count_likes = len(user.likes)
     messages = (Message
                 .query
                 .filter(Message.user_id == user_id)
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
-    return render_template('users/show.html', user=user, messages=messages)
+    return render_template('users/show.html', user=user, messages=messages, form=form, count_likes = count_likes)
 
 
 @app.route('/users/<int:user_id>/following')
@@ -216,6 +219,10 @@ def profile():
 
     # IMPLEMENT THIS
 
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
     form = EditProfileForm(obj=g.user)
 
     if form.validate_on_submit():
@@ -231,7 +238,7 @@ def profile():
             user.bio = form.bio.data
             db.session.add(user)
             db.session.commit()
-            return redirect(f"users/{g.user.id}")
+            return redirect(f"/users/{g.user.id}")
 
         flash("Invalid credentials.", 'danger')
 
@@ -284,9 +291,14 @@ def messages_add():
 @app.route('/messages/<int:message_id>', methods=["GET"])
 def messages_show(message_id):
     """Show a message."""
-
+    form = LikesForm()
     msg = Message.query.get(message_id)
-    return render_template('messages/show.html', message=msg)
+    msgs_ive_liked = [u.message_id for u in g.user.likes]
+    liked_msgs = (Like
+                    .query
+                    .filter(Message.user_id.in_(msgs_ive_liked))
+                    .all())
+    return render_template('messages/show.html', message=msg, form=form, msgs_ive_liked=msgs_ive_liked)
 
 
 @app.route('/messages/<int:message_id>/delete', methods=["POST"])
@@ -303,6 +315,39 @@ def messages_destroy(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
+
+
+@app.route('/messages/<int:message_id>/like', methods=["POST"])
+def handle_message_like(message_id):
+    """Handle a like/unlike of a message."""
+
+    form = LikesForm()
+    if form.validate_on_submit():
+        like_to_delete = Like.query.filter_by(user_id=g.user.id, message_id=message_id).first()
+        if (like_to_delete):
+            db.session.delete(like_to_delete)
+            db.session.commit()
+        else:
+            try:
+                liked_msg = Like(user_id= g.user.id, message_id = message_id)
+                db.session.add(liked_msg)
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+
+    return redirect("/")
+
+@app.route('/users/<int:user_id>/likes')
+def display_liked_msgs(user_id):
+    """Displays a list of messages that a user has liked."""
+
+    user = User.query.get_or_404(user_id)
+    liked_messages = user.liked_messages
+    count_likes = len(liked_messages)
+    return render_template('/users/likes.html', messages=liked_messages, user=user, count_likes=count_likes)
+
+
+    
 
 ##############################################################################
 # Homepage and error pages
@@ -323,7 +368,7 @@ def homepage():
     #                 .limit(100)
     #                 .all())
 
-
+    form = LikesForm()
     if g.user:
         following_ids = [u.id for u in g.user.following]
         messages = (Message
@@ -333,7 +378,7 @@ def homepage():
                     .limit(100)
                     .all())
 
-        return render_template('home.html', messages=messages)
+        return render_template('home.html', messages=messages, form=form)
 
     else:
         return render_template('home-anon.html')
@@ -355,3 +400,4 @@ def add_header(req):
     req.headers["Expires"] = "0"
     req.headers['Cache-Control'] = 'public, max-age=0'
     return req
+

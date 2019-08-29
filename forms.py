@@ -35,3 +35,6 @@ class EditProfileForm(FlaskForm):
     header_image_url = StringField('(Optional) Image URL')
     bio = TextAreaField('Bio')
     password = PasswordField('Password', validators=[Length(min=6)])
+
+class LikesForm(FlaskForm):
+    pass

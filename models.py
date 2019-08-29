@@ -74,6 +74,10 @@ class User(db.Model):
 
     messages = db.relationship('Message')
 
+    likes = db.relationship('Like')
+
+    liked_messages = db.relationship("Message", secondary="likes")
+
     followers = db.relationship(
         "User",
         secondary="follows",
@@ -171,6 +175,20 @@ class Message(db.Model):
     )
 
     user = db.relationship('User')
+
+    likes = db.relationship('Like')
+
+    users_who_liked = db.relationship("User", secondary="likes")
+
+class Like(db.Model):
+    """Mapping of a message to a user when liked. Many to many between Users and Messages"""
+
+    __tablename__ = 'likes'
+    __table_args__ = (db.UniqueConstraint('user_id', 'message_id'),)
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    message_id = db.Column(db.Integer, db.ForeignKey('messages.id'))
 
 
 def connect_db(app):
