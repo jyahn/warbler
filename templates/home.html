@@ -42,7 +42,7 @@
       <ul class="list-group" id="messages">
         {% for msg in messages %}
           <li class="list-group-item">
-            <a href="/messages/{{ msg.id  }}" class="message-link"/>
+            <a href="/messages/{{ msg.id  }}" class="message-link">
             <a href="/users/{{ msg.user.id }}">
               <img src="{{ msg.user.image_url }}" alt="" class="timeline-image">
             </a>
@@ -52,7 +52,6 @@
               <span class="text-muted">{{ msg.timestamp.strftime('%d %B %Y') }}</span>
               
               <p>{{ msg.text }}</p>
-              <!-- This button is not clickable at the moment. It keeps redirecting to the page where it shows the message in a new page. Fix later.
               <form method="POST" action="/messages/{{msg.id}}/like">
                 {{ form.hidden_tag() }}
                 {% if msg.id in msgs_ive_liked %}
@@ -64,7 +63,7 @@
                   <i class="far fa-heart"></i>
                 </button>
                 {% endif %}
-              </form> -->
+              </form>
             </div>
           </li>
           

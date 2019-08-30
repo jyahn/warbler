@@ -16,8 +16,21 @@
             <a href="/users/{{ user.id }}">@{{ user.username }}</a>
             <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
             <p>{{ message.text }}</p>
+            <form method="POST" action="/messages/{{message.id}}/like">
+              {{ form.hidden_tag() }}
+              {% if message.id in msgs_ive_liked %}
+              <button class="btn">
+                <i class="fas fa-heart"></i>
+              </button>
+              {% else %}
+              <button class="btn">
+                <i class="far fa-heart"></i>
+              </button>
+              {% endif %}
+            </form>
           </div>
         </li>
+        
 
       {% endfor %}
 

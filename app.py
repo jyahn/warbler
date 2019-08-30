@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask, render_template, request, flash, redirect, session, g
-from flask_debugtoolbar import DebugToolbarExtension
+# from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm, EditProfileForm, LikesForm
@@ -20,7 +20,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
-toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
@@ -150,13 +150,14 @@ def users_show(user_id):
     # user.messages won't be in order by default
     # import pdb; pdb.set_trace()
     count_likes = len(user.likes)
+    msgs_ive_liked = [u.message_id for u in g.user.likes]
     messages = (Message
                 .query
                 .filter(Message.user_id == user_id)
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
-    return render_template('users/show.html', user=user, messages=messages, form=form, count_likes = count_likes)
+    return render_template('users/show.html', user=user, messages=messages, form=form, count_likes=count_likes, msgs_ive_liked=msgs_ive_liked)
 
 
 @app.route('/users/<int:user_id>/following')
@@ -245,7 +246,6 @@ def profile():
     return render_template("users/edit.html", form=form)
 
 
-
 @app.route('/users/delete', methods=["POST"])
 def delete_user():
     """Delete user."""
@@ -295,9 +295,9 @@ def messages_show(message_id):
     msg = Message.query.get(message_id)
     msgs_ive_liked = [u.message_id for u in g.user.likes]
     liked_msgs = (Like
-                    .query
-                    .filter(Message.user_id.in_(msgs_ive_liked))
-                    .all())
+                  .query
+                  .filter(Message.user_id.in_(msgs_ive_liked))
+                  .all())
     return render_template('messages/show.html', message=msg, form=form, msgs_ive_liked=msgs_ive_liked)
 
 
@@ -316,26 +316,27 @@ def messages_destroy(message_id):
     return redirect(f"/users/{g.user.id}")
 
 
-
 @app.route('/messages/<int:message_id>/like', methods=["POST"])
 def handle_message_like(message_id):
     """Handle a like/unlike of a message."""
 
     form = LikesForm()
     if form.validate_on_submit():
-        like_to_delete = Like.query.filter_by(user_id=g.user.id, message_id=message_id).first()
+        like_to_delete = Like.query.filter_by(
+            user_id=g.user.id, message_id=message_id).first()
         if (like_to_delete):
             db.session.delete(like_to_delete)
             db.session.commit()
         else:
             try:
-                liked_msg = Like(user_id= g.user.id, message_id = message_id)
+                liked_msg = Like(user_id=g.user.id, message_id=message_id)
                 db.session.add(liked_msg)
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
 
     return redirect("/")
+
 
 @app.route('/users/<int:user_id>/likes')
 def display_liked_msgs(user_id):
@@ -346,8 +347,6 @@ def display_liked_msgs(user_id):
     count_likes = len(liked_messages)
     return render_template('/users/likes.html', messages=liked_messages, user=user, count_likes=count_likes)
 
-
-    
 
 ##############################################################################
 # Homepage and error pages
@@ -371,6 +370,9 @@ def homepage():
     form = LikesForm()
     if g.user:
         following_ids = [u.id for u in g.user.following]
+
+        msgs_ive_liked = [u.message_id for u in g.user.likes]
+
         messages = (Message
                     .query
                     .order_by(Message.timestamp.desc())
@@ -378,7 +380,7 @@ def homepage():
                     .limit(100)
                     .all())
 
-        return render_template('home.html', messages=messages, form=form)
+        return render_template('home.html', messages=messages, form=form, msgs_ive_liked=msgs_ive_liked)
 
     else:
         return render_template('home-anon.html')
@@ -400,4 +402,3 @@ def add_header(req):
     req.headers["Expires"] = "0"
     req.headers['Cache-Control'] = 'public, max-age=0'
     return req
-
