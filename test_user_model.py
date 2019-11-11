@@ -6,22 +6,21 @@
 
 
 # import os // os.environ // everything else
-import os
-os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
-from app import app
-from unittest import TestCase
-from sqlalchemy.exc import IntegrityError, InvalidRequestError
-from models import db, User, Message, Follows
-# from psycopg2 import IntegrityError
-
 
 # BEFORE we import our app, let's set an environmental variable
 # to use a different database for tests (we need to do this
 # before we import our app, since that will have already
 # connected to the database
 
-
+import os
+os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
 # Now we can import app
+from app import app
+from unittest import TestCase
+from sqlalchemy.exc import IntegrityError, InvalidRequestError
+from models import db, User, Message, Follows
+# from psycopg2 import IntegrityError
+
 
 
 # Create our tables (we do this here, so we only create the tables
@@ -115,7 +114,19 @@ class UserModelTestCase(TestCase):
 
     def test_authenticate(self):
 
-        user_2 = User.authenticate(self.u2.username, PASSWORD)
+        authentication = User.authenticate(self.u2.username, PASSWORD)
 
-        self.assertEqual(
-            '<User #2: uniqueusername2, uniqueemail2@email.com>', str(user_2))
+        self.assertTrue(authentication)
+
+
+    def test_authenticate_bad_username(self):
+
+        authentication = User.authenticate(self.u3.username, "wrongpass")
+
+        self.assertFalse(authentication)
+
+    def test_authenticate_bad_pass(self):
+        authentication = User.authenticate("wrongusername", PASSWORD)
+
+        self.assertFalse(authentication)
+

@@ -4,22 +4,17 @@
 #
 #    python -m unittest test_message_model.py
 
-
-from app import app
-import os
-from unittest import TestCase
-
-from models import db, User, Message, Follows
-
 # BEFORE we import our app, let's set an environmental variable
 # to use a different database for tests (we need to do this
 # before we import our app, since that will have already
 # connected to the database
 
+import os
 os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
-
-
 # Now we can import app
+from app import app
+from models import db, User, Message, Follows
+from unittest import TestCase
 
 
 # Create our tables (we do this here, so we only create the tables
@@ -41,43 +36,32 @@ class UserModelTestCase(TestCase):
 
         self.client = app.test_client()
 
-    def test_message_model(self):
-        """Does basic model work?"""
-        u = User(
-            email="test@test.com",
-            username="testuser",
-            password="HASHED_PASSWORD"
-        )
+        u1 = User.signup(
+            "uniqueusername1", "uniqueemail1@email.com", PASSWORD, None)
 
-        db.session.add(u)
+        u1.id = 1
         db.session.commit()
 
         m = Message(
             text="Hello World.",
-            timestamp="2017-02-28 10:45:16.076174",
+            timestamp=datetime.utcnow(),
             user_id=u.id
         )
 
-        db.session.add(m)
-        db.session.commit()
+    def test_message_model(self):
+        """Does basic model work?"""
 
         self.assertEqual(len(u.messages), 1)
         self.assertEqual(len(u.followers), 0)
+        self.assertEqual(Message.query.count(), 1)
 
-    def test_message_model_2(self):
-        """Does is_following work as intended?"""
+    def test_text(self):
+        """Is the text of the message correct?"""
 
-        u1 = User(
-            email="test1@test.com",
-            username="testuser1",
-            password="HASHED_PASSWORD"
-        )
 
-        m = Message(
-            text="Hello World.",
-            timestamp="2017-02-28 10:45:16.076174",
-            user_id=u1.id
-        )
+    def test_timestamp(self):
+        """Is the timestamp of the message correct?"""
 
-        u1.messages.append(m)
-        self.assertEqual(len(u1.messages), 1)
+
+    def test_user_id(self):
+        """Is the user_id of the message correct?"""
