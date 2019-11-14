@@ -26,6 +26,30 @@ class Follows(db.Model):
         primary_key=True,
     )
 
+class Thread(db.Model):
+    """Connection from one user to another for a dm """
+
+    __tablename__ = 'threads'
+
+    id = db.Column(
+        db.Integer, autoincrement=True, primary_key=True
+    )
+
+    user1_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete="cascade"))
+
+    user2_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete="cascade"))
+
+    db.UniqueConstraint('user1_id', 'user2_id')
+
+    user1 = db.relationship("User", foreign_keys=[user1_id])
+    user2 = db.relationship("User", foreign_keys=[user2_id])
+
+    dms = db.relationship("DM", backref="thread")
+
 
 class User(db.Model):
     """User in the system."""
@@ -91,6 +115,14 @@ class User(db.Model):
         primaryjoin=(Follows.user_following_id == id),
         secondaryjoin=(Follows.user_being_followed_id == id)
     )
+
+    people_talking_to = db.relationship(
+        "User",
+        secondary="threads",
+        primaryjoin=(Thread.user1_id == id),
+        secondaryjoin=(Thread.user2_id == id),
+        backref=db.backref('people_talking_to_me', lazy='dynamic'),
+        lazy='dynamic')
 
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
@@ -190,6 +222,42 @@ class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     message_id = db.Column(db.Integer, db.ForeignKey('messages.id'))
+
+
+
+
+class DM(db.Model):
+    """the exact message, connected to a thread"""
+    __tablename__ = 'dms'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True, autoincrement=True
+    )
+
+    text = db.Column(
+        db.Text,
+        nullable=False,
+    )
+
+    timestamp = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow(),
+    )
+
+    thread_id = db.Column(
+        db.Integer,
+        db.ForeignKey('threads.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+
+    author = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    user = db.relationship("User", backref="dm")
 
 
 def connect_db(app):
