@@ -53,22 +53,23 @@
           </a>
 
           <div class="message-area">
-            <a href="/users/{{ msg.user.id }}">@{{ msg.user.username }}</a>
-            <span class="text-muted">{{ msg.timestamp.strftime('%d %B %Y') }}</span>
-
+            <div class="message-heading row">
+              <a href="/users/{{ msg.user.id }}" class="ml-3 mr-2">@{{ msg.user.username }}</a>
+              <span class="text-muted">{{ msg.timestamp.strftime('%d %B %Y') }}</span>
+              <form method="POST" action="/messages/{{msg.id}}/like" class="like-form">
+                {{ form.hidden_tag() }}
+                {% if msg.id in msgs_ive_liked %}
+                <button class="btn">
+                  <i class="fas fa-heart"></i>
+                </button>
+                {% else %}
+                <button class="btn">
+                  <i class="far fa-heart"></i>
+                </button>
+                {% endif %}
+              </form>
+            </div>
             <p>{{ msg.text }}</p>
-            <form method="POST" action="/messages/{{msg.id}}/like">
-              {{ form.hidden_tag() }}
-              {% if msg.id in msgs_ive_liked %}
-              <button class="btn">
-                <i class="fas fa-heart"></i>
-              </button>
-              {% else %}
-              <button class="btn">
-                <i class="far fa-heart"></i>
-              </button>
-              {% endif %}
-            </form>
           </div>
       </li>
 

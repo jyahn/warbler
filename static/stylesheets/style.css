@@ -198,9 +198,17 @@ nav + .container {
   text-align: center;
 }
 
-.message-area,
+.message-area {
+  display: inline-block;
+  width: 100%;
+}
 .timeline-image {
   display: inline-block;
+}
+
+.like-form {
+  margin-left: auto;
+  margin-right: 0;
 }
 
 .message-area {
@@ -508,6 +516,11 @@ p.card-bio {
   right: 0;
   bottom: 0;
   background-color: #62676c;
+}
+
+
+.like-form {
+  float:right;
 }
 
 #messages.no-hover .message-area {

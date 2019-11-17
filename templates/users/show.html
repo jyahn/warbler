@@ -1,22 +1,36 @@
 {% extends 'users/detail.html' %}
 {% block user_details %}
-  <div class="col-sm-6">
-    <ul class="list-group" id="messages">
+<div class="col-sm-6">
+  <ul class="list-group" id="messages">
 
-      {% for message in messages %}
+    {% for message in messages %}
 
-        <li class="list-group-item">
-          <a href="/messages/{{ message.id }}" class="message-link"/>
+    <li class="list-group-item">
+      <a href="/messages/{{ message.id }}" class="message-link" />
 
-          <a href="/users/{{ user.id }}">
-            <img src="{{ user.image_url }}" alt="user image" class="timeline-image">
-          </a>
+      <a href="/users/{{ user.id }}">
+        <img src="{{ user.image_url }}" alt="user image" class="timeline-image">
+      </a>
 
-          <div class="message-area">
-            <a href="/users/{{ user.id }}">@{{ user.username }}</a>
-            <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
-            <p>{{ message.text }}</p>
-            <form method="POST" action="/messages/{{message.id}}/like">
+      <div class="message-area">
+        <div class="message-heading row">
+          <a href="/users/{{ user.id }}" class="ml-3 mr-2">@{{ user.username }}</a>
+          <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
+          <form method="POST" action="/messages/{{message.id}}/like" class="like-form">
+            {{ form.hidden_tag() }}
+            {% if message.id in msgs_ive_liked %}
+            <button class="btn">
+              <i class="fas fa-heart"></i>
+            </button>
+            {% else %}
+            <button class="btn">
+              <i class="far fa-heart"></i>
+            </button>
+            {% endif %}
+          </form>
+        </div>
+        <p>{{ message.text }}</p>
+        <!-- <form method="POST" action="/messages/{{message.id}}/like">
               {{ form.hidden_tag() }}
               {% if message.id in msgs_ive_liked %}
               <button class="btn">
@@ -27,14 +41,14 @@
                 <i class="far fa-heart"></i>
               </button>
               {% endif %}
-            </form>
-          </div>
-        </li>
-        
-
-      {% endfor %}
+            </form> -->
+      </div>
+    </li>
 
 
-    </ul>
-  </div>
+    {% endfor %}
+
+
+  </ul>
+</div>
 {% endblock %}
