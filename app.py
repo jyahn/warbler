@@ -428,7 +428,7 @@ def add_thread(user_id):
 
     if thread2:
         print ('wow2')
-        return redirect(f'threads/{thread2[0].id}')
+        return redirect(f"/threads/{thread2[0].id}")
 
     # else:
     if (user_id < g.user.id):
