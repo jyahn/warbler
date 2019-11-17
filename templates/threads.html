@@ -1,43 +1,43 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row">
-  <div class='container'>
-
+<div class='container'>
+  <div class="col-lg-8 offset-2">
     {% for thread in my_user2_threads %}
     <a href="/threads/{{ thread.id  }}" class="thread-link">
-    <div class='row message-row'>
-      <div class='col-2'>
-          <img src="{{ thread.user1.image_url }}" alt="" class="timeline-image">
-          <div>{{thread.user1.username}}</div>
+      <div class='row message-row'>
+        <div class='col-2'>
+          <img src="{{ thread.user1.image_url }}" alt="" class="dm-image">
         </div>
         <div class='col-10'>
+          <div><strong>{{thread.user1.username}}</strong></div>
           {% if thread.dms %}
-            {{thread.dms[-1].text}}        
+          {{thread.dms[-1].text}}
           {% endif %}
         </div>
-        
+
       </div>
     </a>
     {% endfor %}
 
     {% for thread in my_user1_threads %}
     <a href="/threads/{{ thread.id  }}" class="thread-link">
-    <div class='row message-row'>
-      <div class='col-2'>
-          <img src="{{ thread.user2.image_url }}" alt="" class="timeline-image">
+      <div class='row message-row'>
+        <div class='col-2'>
+          <img src="{{ thread.user2.image_url }}" alt="" class="dm-image">
           <div>{{thread.user2.username}}</div>
         </div>
         <div class='col-10'>
           {% if thread.dms %}
-            {{thread.dms[-1].text}}        
+          {{thread.dms[-1].text}}
           {% endif %}
-  
+
         </div>
-        
+
       </div>
     </a>
     {% endfor %}
   </div>
+</div>
 
 
 

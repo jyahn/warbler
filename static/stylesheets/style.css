@@ -184,6 +184,13 @@ nav + .container {
   border-radius: 48px;
   height: 48px;
   width: 48px;
+  margin-top: 5px;
+}
+
+.dm-image {
+  border-radius: 50%;
+  height: 70px;
+  width: 70px;
   margin-top: 2px;
 }
 
