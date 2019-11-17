@@ -461,10 +461,12 @@ def show_thread(thread_id):
     if g.user.id == thread.user1_id or g.user.id == thread.user2_id:
         if (g.user.id == thread.user1_id):
             other_username = thread.user2.username
+            other_pic = thread.user2.image_url
         else:
             other_username = thread.user1.username
+            other_pic = thread.user1.image_url
 
-        return render_template("show-thread.html", thread=thread, other_username=other_username)
+        return render_template("show-thread.html", thread=thread, other_username=other_username, other_pic = other_pic)
     else:
         flash('Unauthorized', 'danger')
         return redirect('/')

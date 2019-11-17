@@ -194,6 +194,10 @@ nav + .container {
   margin-top: 2px;
 }
 
+.dm-pic-cont {
+  text-align: center;
+}
+
 .message-area,
 .timeline-image {
   display: inline-block;
@@ -557,6 +561,8 @@ p.card-bio {
 
 .dm-header {
   text-align: center;
+  margin-top: 10px;
+  margin-bottom: 40px;
 }
 
 .my.dm-row {
