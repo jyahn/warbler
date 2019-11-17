@@ -401,13 +401,25 @@ def homepage():
 
 @app.route('/threads')
 def list_threads():
-    """Page with listing of threads.
-    """
-    # query the threads where I'm user 1
-    my_user1_threads = Thread.query.filter(Thread.user1_id == g.user.id).all()
-    # query the threads where I'm user 2
-    my_user2_threads = Thread.query.filter(Thread.user2_id == g.user.id).all()
-    return render_template('threads.html', my_user1_threads=my_user1_threads, my_user2_threads=my_user2_threads)
+    """Page with listing of threads."""
+
+    threads_with_dms = DM.query.all()
+    threads_with_dms_ids = [u.thread_id for u in threads_with_dms]
+
+    threads_master = (Thread
+                .query
+                .filter(Thread.id.in_(threads_with_dms_ids))
+                .all())
+
+    #the threads where I'm user 1
+    threads_1 = [thread for thread in threads_master if thread.user1_id == g.user.id]
+    print("threasds1",threads_1)
+    #the threads where I'm user 2
+    threads_2 = [thread for thread in threads_master if thread.user2_id == g.user.id]
+    print ("threads2", threads_2)
+    #todo: fix bug where dm to self appears twice because it appears in both threads_1 and threads_2
+
+    return render_template('threads.html', my_user1_threads=threads_1, my_user2_threads=threads_2)
     
 
 @app.route('/threads/add/<int:user_id>', methods=["POST"])
