@@ -24,10 +24,9 @@
       <div class='row message-row'>
         <div class='col-2'>
           <img src="{{ thread.user2.image_url }}" alt="" class="dm-image">
-          <div>{{thread.user2.username}}</div>
         </div>
         <div class='col-10'>
-            <div><strong>{{thread.user2.username}}</strong></div>
+          <div><strong>{{thread.user2.username}}</strong></div>
           {% if thread.dms %}
           {{thread.dms[-1].text}}
           {% endif %}
