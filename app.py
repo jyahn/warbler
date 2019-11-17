@@ -5,7 +5,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm, EditProfileForm, LikesForm
-from models import db, connect_db, User, Message, Like
+from models import db, connect_db, User, Message, Like, Thread, DM
 
 CURR_USER_KEY = "curr_user"
 
@@ -18,7 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 # toolbar = DebugToolbarExtension(app)
 
@@ -388,6 +388,13 @@ def homepage():
         return render_template('home-anon.html')
 
 
+# @app.errorhandler(404)
+# def page_not_found(e):
+#     """404 NOT FOUND page."""
+
+#     return render_template('404.html'), 404
+
+
 ##############################################################################
 # Thread and DM pages
 
@@ -403,8 +410,9 @@ def list_threads():
     return render_template('threads.html', my_user1_threads=my_user1_threads, my_user2_threads=my_user2_threads)
     
 
-@app.route('/threads/add/<int:user_id>', methods=['POST'])
+@app.route('/threads/add/<int:user_id>', methods=["POST"])
 def add_thread(user_id):
+    print ("am i in here")
     """Page to add a thread. """
     # if this user id combo exists
     thread = Thread.query.filter(
@@ -414,9 +422,12 @@ def add_thread(user_id):
         Thread.user2_id == user_id, Thread.user1_id == g.user.id).all()
 
     if thread:
-        return redirect(f'threads/{thread[0].id}')
+        print ('wow')
+        return redirect(f"/threads/{thread[0].id}")
+        print('wow?')
 
     if thread2:
+        print ('wow2')
         return redirect(f'threads/{thread2[0].id}')
 
     # else:
@@ -426,11 +437,13 @@ def add_thread(user_id):
         new_thread = Thread(user1_id=g.user.id, user2_id=user_id)
     db.session.add(new_thread)
     db.session.commit()
-    return redirect(f'threads/{new_thread.id}')
+    print('lmao')
+    return redirect(f"/threads/{new_thread.id}")
 
 
 @app.route('/threads/<int:thread_id>')
 def show_thread(thread_id):
+    print('what about here')
     """Page to see a thread. """
     thread = Thread.query.get(thread_id)
     if g.user.id == thread.user1_id or g.user.id == thread.user2_id:
@@ -448,6 +461,7 @@ def show_thread(thread_id):
 @app.route('/threads/<int:thread_id>/dm/add', methods=["POST"])
 def add_dm(thread_id):
     """adds a dm"""
+    print ('am i in dm')
     thread = Thread.query.get(thread_id)
     text = request.json["text"]
     dm = DM(text=text, thread_id=thread_id, author=g.user.id)
@@ -455,8 +469,6 @@ def add_dm(thread_id):
     db.session.commit()
     all_dms = [[dm.text, dm.author] for dm in thread.dms]
     return jsonify(all_dms)
-
-
 
 
 
