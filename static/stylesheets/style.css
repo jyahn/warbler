@@ -541,6 +541,9 @@ p.card-bio {
   flex: 1;
 }
 
+
+
+
 .dm.container {
   background-color: white;
 }
@@ -549,7 +552,7 @@ p.card-bio {
   text-align: center;
 }
 
-.self.dm-row {
+.my.dm-row {
   background-color: rgb(0, 121, 255);
   color: white;
   max-width: 300px;
