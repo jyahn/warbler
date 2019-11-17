@@ -585,3 +585,22 @@ p.card-bio {
 #dm-input {
   text-align: right;
 }
+
+.message-row {
+  background-color: white;
+  border-radius: 50px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  padding-left: 30px;
+}
+
+.thread-link,
+.thread-link:hover {
+  color: black;
+  text-decoration: none;
+}
+
+.message-row:hover {
+  background-color: rgb(249, 249, 249);
+}
