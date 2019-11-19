@@ -630,3 +630,7 @@ p.card-bio {
 .message-row:hover {
   background-color: rgb(249, 249, 249);
 }
+
+.user-card{
+  height: 80%;
+}
