@@ -209,6 +209,7 @@ nav + .container {
 .like-form {
   margin-left: auto;
   margin-right: 0;
+  z-index: 1;
 }
 
 .message-area {
@@ -631,7 +632,12 @@ p.card-bio {
   background-color: rgb(249, 249, 249);
 }
 
-.user-card{
+/* .user-card{
   height: 100%;
-  max-height: 400px;
+  max-height: 300px;
+  margin-bottom 20px;
+} */
+
+.card-bio {
+  font-size: 0.9em;
 }
