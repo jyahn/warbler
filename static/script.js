@@ -1,5 +1,5 @@
-const BASE_URL = 'https://warbler-ja.herokuapp.com';
-// const BASE_URL = 'http://localhost:5000';
+// const BASE_URL = 'https://warbler-ja.herokuapp.com';
+const BASE_URL = 'http://localhost:5000';
 
 $(document).ready(function () {
   $('#dm-form').on('submit', function (evt) {
