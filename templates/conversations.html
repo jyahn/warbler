@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class='container'>
+  <div class="col-lg-8 offset-2">
+    {% for conversation in my_user2_conversations %}
+    <a href="/conversations/{{ conversation.id  }}" class="conversation-link">
+      <div class='row message-row'>
+        <div class='col-2'>
+          <img src="{{ conversation.user1.image_url }}" alt="" class="dm-image">
+        </div>
+        <div class='col-10'>
+          <div><strong>{{conversation.user1.username}}</strong></div>
+          {% if conversation.dms %}
+          {{conversation.dms[-1].text}}
+          {% endif %}
+        </div>
+
+      </div>
+    </a>
+    {% endfor %}
+
+    {% for conversation in my_user1_conversations %}
+    <a href="/conversations/{{ conversation.id  }}" class="conversation-link">
+      <div class='row message-row'>
+        <div class='col-2'>
+          <img src="{{ conversation.user2.image_url }}" alt="" class="dm-image">
+        </div>
+        <div class='col-10'>
+          <div><strong>{{conversation.user2.username}}</strong></div>
+          {% if conversation.dms %}
+          {{conversation.dms[-1].text}}
+          {% endif %}
+
+        </div>
+
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+
+
+</div>
+{% endblock %}

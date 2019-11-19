@@ -621,8 +621,8 @@ p.card-bio {
   padding-left: 30px;
 }
 
-.thread-link,
-.thread-link:hover {
+.conversation-link,
+.conversation-link:hover {
   color: black;
   text-decoration: none;
 }

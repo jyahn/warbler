@@ -5,7 +5,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm, EditProfileForm, LikesForm
-from models import db, connect_db, User, Message, Like, Thread, DM
+from models import db, connect_db, User, Message, Like, Conversation, DM
 
 CURR_USER_KEY = "curr_user"
 
@@ -396,92 +396,89 @@ def homepage():
 
 
 ##############################################################################
-# Thread and DM pages
+# Conversation and DM pages
 
 
-@app.route('/threads')
-def list_threads():
-    """Page with listing of threads."""
+@app.route('/conversations')
+def list_conversationss():
+    """Page with listing of conversations."""
 
-    threads_with_dms = DM.query.all()
-    threads_with_dms_ids = [u.thread_id for u in threads_with_dms]
+    conversations_with_dms = DM.query.all()
+    conversations_with_dms_ids = [u.conversation_id for u in conversations_with_dms]
 
-    threads_master = (Thread
+    conversations_master = (Conversation
                 .query
-                .filter(Thread.id.in_(threads_with_dms_ids))
+                .filter(Conversation.id.in_(conversations_with_dms_ids))
                 .all())
 
-    #the threads where I'm user 1
-    threads_1 = [thread for thread in threads_master if thread.user1_id == g.user.id]
-    print("threasds1",threads_1)
-    #the threads where I'm user 2
-    threads_2 = [thread for thread in threads_master if thread.user2_id == g.user.id]
-    print ("threads2", threads_2)
-    #todo: fix bug where dm to self appears twice because it appears in both threads_1 and threads_2
+    #the conversations where I'm user 1
+    conversations_1 = [conversation for conversation in conversations_master if conversation.user1_id == g.user.id]
+    #the conversations where I'm user 2
+    conversations_2 = [conversation for conversation in conversations_master if conversation.user2_id == g.user.id]
+    #todo: fix bug where dm to self appears twice because it appears in both conversations_1 and conversations_2
 
-    return render_template('threads.html', my_user1_threads=threads_1, my_user2_threads=threads_2)
+    return render_template('conversations.html', my_user1_conversations=conversations_1, my_user2_conversations=conversations_2)
     
 
-@app.route('/threads/add/<int:user_id>', methods=["POST"])
-def add_thread(user_id):
+@app.route('/conversations/add/<int:user_id>', methods=["POST"])
+def add_conversation(user_id):
     print ("am i in here")
-    """Page to add a thread. """
+    """Page to add a conversation. """
     # if this user id combo exists
-    thread = Thread.query.filter(
-        Thread.user1_id == user_id, Thread.user2_id == g.user.id).all()
+    conversation = Conversation.query.filter(
+        Conversation.user1_id == user_id, Conversation.user2_id == g.user.id).all()
 
-    thread2 = Thread.query.filter(
-        Thread.user2_id == user_id, Thread.user1_id == g.user.id).all()
+    conversation2 = Conversation.query.filter(
+        Conversation.user2_id == user_id, Conversation.user1_id == g.user.id).all()
 
-    if thread:
+    if conversation:
         print ('wow')
-        return redirect(f"/threads/{thread[0].id}")
-        print('wow?')
+        return redirect(f"/conversations/{conversation[0].id}")
 
-    if thread2:
+    if conversation2:
         print ('wow2')
-        return redirect(f"/threads/{thread2[0].id}")
+        return redirect(f"/conversations/{conversation2[0].id}")
 
     # else:
     if (user_id < g.user.id):
-        new_thread = Thread(user1_id=user_id, user2_id=g.user.id)
+        new_conversation = Conversation(user1_id=user_id, user2_id=g.user.id)
     else:
-        new_thread = Thread(user1_id=g.user.id, user2_id=user_id)
-    db.session.add(new_thread)
+        new_conversation = Conversation(user1_id=g.user.id, user2_id=user_id)
+    db.session.add(new_conversation)
     db.session.commit()
     print('lmao')
-    return redirect(f"/threads/{new_thread.id}")
+    return redirect(f"/conversations/{new_conversation.id}")
 
 
-@app.route('/threads/<int:thread_id>')
-def show_thread(thread_id):
+@app.route('/conversations/<int:conversation_id>')
+def show_conversation(conversation_id):
     print('what about here')
-    """Page to see a thread. """
-    thread = Thread.query.get(thread_id)
-    if g.user.id == thread.user1_id or g.user.id == thread.user2_id:
-        if (g.user.id == thread.user1_id):
-            other_username = thread.user2.username
-            other_pic = thread.user2.image_url
+    """Page to see a conversation. """
+    conversation = Conversation.query.get(conversation_id)
+    if g.user.id == conversation.user1_id or g.user.id == conversation.user2_id:
+        if (g.user.id == conversation.user1_id):
+            other_username = conversation.user2.username
+            other_pic = conversation.user2.image_url
         else:
-            other_username = thread.user1.username
-            other_pic = thread.user1.image_url
+            other_username = conversation.user1.username
+            other_pic = conversation.user1.image_url
 
-        return render_template("show-thread.html", thread=thread, other_username=other_username, other_pic = other_pic)
+        return render_template("show-conversation.html", conversation=conversation, other_username=other_username, other_pic = other_pic)
     else:
         flash('Unauthorized', 'danger')
         return redirect('/')
 
 
-@app.route('/threads/<int:thread_id>/dm/add', methods=["POST"])
-def add_dm(thread_id):
+@app.route('/conversations/<int:conversation_id>/dm/add', methods=["POST"])
+def add_dm(conversation_id):
     """adds a dm"""
     print ('am i in dm')
-    thread = Thread.query.get(thread_id)
+    conversation = Conversation.query.get(conversation_id)
     text = request.json["text"]
-    dm = DM(text=text, thread_id=thread_id, author=g.user.id)
+    dm = DM(text=text, conversation_id=conversation_id, author=g.user.id)
     db.session.add(dm)
     db.session.commit()
-    all_dms = [[dm.text, dm.author] for dm in thread.dms]
+    all_dms = [[dm.text, dm.author] for dm in conversation.dms]
     return jsonify(all_dms)
 
 

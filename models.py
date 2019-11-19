@@ -26,10 +26,10 @@ class Follows(db.Model):
         primary_key=True,
     )
 
-class Thread(db.Model):
+class Conversation(db.Model):
     """Connection from one user to another for a dm """
 
-    __tablename__ = 'threads'
+    __tablename__ = 'conversations'
 
     id = db.Column(
         db.Integer, autoincrement=True, primary_key=True
@@ -48,7 +48,7 @@ class Thread(db.Model):
     user1 = db.relationship("User", foreign_keys=[user1_id])
     user2 = db.relationship("User", foreign_keys=[user2_id])
 
-    dms = db.relationship("DM", backref="thread")
+    dms = db.relationship("DM", backref="conversation")
 
 
 class User(db.Model):
@@ -118,9 +118,9 @@ class User(db.Model):
 
     people_talking_to = db.relationship(
         "User",
-        secondary="threads",
-        primaryjoin=(Thread.user1_id == id),
-        secondaryjoin=(Thread.user2_id == id),
+        secondary="conversations",
+        primaryjoin=(Conversation.user1_id == id),
+        secondaryjoin=(Conversation.user2_id == id),
         backref=db.backref('people_talking_to_me', lazy='dynamic'),
         lazy='dynamic')
 
@@ -227,7 +227,7 @@ class Like(db.Model):
 
 
 class DM(db.Model):
-    """the exact message, connected to a thread"""
+    """the exact message, connected to a conversation"""
     __tablename__ = 'dms'
 
     id = db.Column(
@@ -246,9 +246,9 @@ class DM(db.Model):
         default=datetime.utcnow(),
     )
 
-    thread_id = db.Column(
+    conversation_id = db.Column(
         db.Integer,
-        db.ForeignKey('threads.id', ondelete='CASCADE'),
+        db.ForeignKey('conversations.id', ondelete='CASCADE'),
         nullable=False,
     )
 

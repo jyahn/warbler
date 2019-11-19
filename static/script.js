@@ -6,20 +6,20 @@ $(document).ready(function () {
     evt.preventDefault();
     let text = $('#dm-input').val();
     if (text.length > 1) {
-      let threadArr = document.URL.split('/');
-      let threadId = parseInt(threadArr[threadArr.length - 1]);
+      let conversationArr = document.URL.split('/');
+      let conversationId = parseInt(conversationArr[conversationArr.length - 1]);
       $('#dm-form').trigger('reset');
-      addDM(text, threadId, function (resp) {
+      addDM(text, conversationId, function (resp) {
         console.log(resp);
       });
     }
   });
 });
 
-function addDM(text, threadId, cb) {
+function addDM(text, conversationId, cb) {
   $.ajax({
     method: 'POST',
-    url: `${BASE_URL}/threads/${threadId}/dm/add`,
+    url: `${BASE_URL}/conversations/${conversationId}/dm/add`,
     contentType: 'application/json',
     data: JSON.stringify({ text }),
     success: response => {
