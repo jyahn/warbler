@@ -423,7 +423,6 @@ def list_conversationss():
 
 @app.route('/conversations/add/<int:user_id>', methods=["POST"])
 def add_conversation(user_id):
-    print ("am i in here")
     """Page to add a conversation. """
     # if this user id combo exists
     conversation = Conversation.query.filter(
@@ -433,11 +432,9 @@ def add_conversation(user_id):
         Conversation.user2_id == user_id, Conversation.user1_id == g.user.id).all()
 
     if conversation:
-        print ('wow')
         return redirect(f"/conversations/{conversation[0].id}")
 
     if conversation2:
-        print ('wow2')
         return redirect(f"/conversations/{conversation2[0].id}")
 
     # else:
@@ -447,13 +444,11 @@ def add_conversation(user_id):
         new_conversation = Conversation(user1_id=g.user.id, user2_id=user_id)
     db.session.add(new_conversation)
     db.session.commit()
-    print('lmao')
     return redirect(f"/conversations/{new_conversation.id}")
 
 
 @app.route('/conversations/<int:conversation_id>')
 def show_conversation(conversation_id):
-    print('what about here')
     """Page to see a conversation. """
     conversation = Conversation.query.get(conversation_id)
     if g.user.id == conversation.user1_id or g.user.id == conversation.user2_id:
@@ -473,7 +468,6 @@ def show_conversation(conversation_id):
 @app.route('/conversations/<int:conversation_id>/dm/add', methods=["POST"])
 def add_dm(conversation_id):
     """adds a dm"""
-    print ('am i in dm')
     conversation = Conversation.query.get(conversation_id)
     text = request.json["text"]
     dm = DM(text=text, conversation_id=conversation_id, author=g.user.id)

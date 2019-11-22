@@ -19,7 +19,6 @@ $(document).ready(function () {
 });
 
 function addDM(text, conversationId, cb) {
-  console.log("YES")
   $.ajax({
     method: 'POST',
     url: `${BASE_URL}/conversations/${conversationId}/dm/add`,
