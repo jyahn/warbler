@@ -49,9 +49,6 @@ flask run
 - Editing Profile
 - User authentication / authorization
 
-
----
-
 ## Technologies
 
 - Flask
@@ -60,9 +57,6 @@ flask run
 - WTForm
 - Bcrypt
 - PostgreSQL
-- bcrypt
-
---- 
 
 ## Features to add
 
