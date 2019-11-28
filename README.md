@@ -1,6 +1,6 @@
 # Warbler
 
-Warbler is a Python based Twitter clone built on a RESTful Flask API using SQLAlchemy.
+Warbler is a Python based Twitter clone built on a RESTful Flask API using SQLAlchemy. 
 
 Warbler is [live on Heroku](https://warbler-ja.herokuapp.com/).
 
@@ -40,18 +40,13 @@ python seed.py
 flask run
 ```
 
-### Clone
-
-- Clone this repo to your local machine using `https://github.com/jyahn/warbler`
-
----
-
 ## Features
 
 - Direct messaging
-- Posting messages
-- Liking messages
+- Posting warbles (tweets)
+- Liking warbles
 - Following users
+- Editing Profile
 - User authentication / authorization
 
 
@@ -64,6 +59,8 @@ flask run
 - SQLAlchemy
 - WTForm
 - Bcrypt
+- PostgreSQL
+- bcrypt
 
 --- 
 
